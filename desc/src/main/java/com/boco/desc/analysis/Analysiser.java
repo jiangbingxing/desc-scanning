@@ -2,11 +2,8 @@ package com.boco.desc.analysis;
 
 
 
-import java.util.List;
-
-import com.boco.desc.enty.BaseScanning;
-import com.boco.desc.enty.Component;
-import com.boco.desc.enty.IpAndCommod;
+import com.boco.desc.dto.LoginScanning;
+import com.boco.desc.dto.NmapScanning;
 import com.boco.desc.enty.Login;
 
 
@@ -14,8 +11,10 @@ import com.boco.desc.enty.Login;
 	
 public interface Analysiser {
 
-	BaseScanning SingleScanning(String output,Login login);
-	List<Component>NmapScanning(String ip);
+	LoginScanning getLoginScanning(String output,Login login);
+	NmapScanning getNmapScanning(String ip);
+	
+	
 	
 	
 }

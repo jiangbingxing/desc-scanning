@@ -4,42 +4,49 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.boco.desc.enty.Component;
+
+import com.boco.desc.enty.AstMiddleWare;
+
 import com.boco.desc.enty.Login;
+
 import com.boco.desc.util.CommandUtils;
 import com.boco.desc.util.LoadUtil;
+import com.boco.desc.version.AppType;
 import com.boco.sces.command.Command;
 import com.boco.sces.command.CommandImpl;
 import com.boco.sces.login.UserInfo;
 import com.boco.sces.result.Result;
-import com.sun.jndi.url.corbaname.corbanameURLContextFactory;
 
-public class MYSQLAssetLinux2 {
+
+
+public class AstMiddleWareAnalysiser {
 	
-	List<Component> com=new ArrayList<Component>();
-	Component coms=new Component("123","123","123",1,"123", null, null,1);
-	
-	
-	/*未安装应用的查找
+
+	/*中间件应用的查找
+	 * 
 	 * *
 	 */
 	 
-	public List<Component> tomcatCompoentFind(Login login) throws IOException
+	public List<AstMiddleWare> middleWareFind(Login login) throws IOException
 	 {
-		List<Component> com=new ArrayList<Component>();
-		Component coms=new Component("123","123","123",1,"123", null, null, 1);
-		com.add(coms);
-		 List<Component> components=new ArrayList<Component>();
+		List<AstMiddleWare> com=new ArrayList<AstMiddleWare>();		
+		 List<AstMiddleWare> AstMiddleWares=new ArrayList<AstMiddleWare>();
 		 //设置登录信息
 		 UserInfo userInfo = new UserInfo(login.getIp(),login.getPort(),
 				 login.getUsername(), login.getPassword());
 		 
 		 //从配置文件取回所有的未安装应用的 命令
-		 List<String> propertiesList=LoadUtil.LoadPreperties("speApplication.properties");
+		 List<String> propertiesList=LoadUtil.LoadPreperties("ast_middle_ware.properties");
+		 
 		 if(propertiesList!=null&&propertiesList.size()%2==0)
 			 
 			 for (int m = 0; m < propertiesList.size()/2; m++) {
-				 	
+				 
+			//获得未安装应用的名字
+				 String appName=propertiesList.get(2*m).split(" ")[2];
+				 
+				 
+				 //指令结果
 				 Result result1=null;
 				 Result result2=null;
 				 Result result3=null;				 
@@ -68,13 +75,13 @@ public class MYSQLAssetLinux2 {
 										 String[] pStrings=portString.split("\r\n");
 										 
 										 for (int j = 0; j < pStrings.length; j++) {
-											 Component component=new Component();
+											 AstMiddleWare AstMiddleWare=new AstMiddleWare();
 											 String[] nativePorts=pStrings[j].split(":");
 											 String nativePort=nativePorts[nativePorts.length-1];
 											 if(nativePort!=null &&!nativePort.equals(" "));
 											 {
-											 component.setPort(Integer.parseInt(nativePort.trim()));
-											 components.add(component);
+											 AstMiddleWare.setServerPort(((Integer.parseInt(nativePort.trim()))));
+											 AstMiddleWares.add(AstMiddleWare);
 											 }
 										 }
 										 }
@@ -106,18 +113,21 @@ public class MYSQLAssetLinux2 {
 						 {
 					     String username=pathStrings[0].split(" ")[0];
 						 String path=pathStrings[1].split(" ")[0];
-						 for (int i = 0; i < components.size(); i++) {
-							components.get(i).setPath(path);
-							components.get(i).setUsername(username);
-							components.get(i).setStatus("open");
-							components.get(i).setName("tomcat");
+						 for (int i = 0; i < AstMiddleWares.size(); i++) {
+							AstMiddleWares.get(i).setInstallPath(path);;
+							AstMiddleWares.get(i).setInstallUser(username);;
+							AstMiddleWares.get(i).setAstStatus("open");
+							AstMiddleWares.get(i).setAstName(appName);
+							AstMiddleWares.get(i).setManageIp(login.getIp());
+							AstMiddleWares.get(i).setAstTypeId1(AppType.MINDDLEWARE);
+						
 						}
 						 }
 						 else {
 							return com;
 						}
 					 }
-					    return components;                
+					    return AstMiddleWares;                
 					 
 				 } catch (Exception e) {
 					 e.printStackTrace();
@@ -129,12 +139,12 @@ public class MYSQLAssetLinux2 {
 	}
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		List<Component> aComponents=new ArrayList<Component>();
-	     MYSQLAssetLinux2 speAssetLinux=new MYSQLAssetLinux2();
-	     Login login=new Login("10.101.167.174", "root","rootroot");
-	      List<Component> components= speAssetLinux.tomcatCompoentFind((login));
-	      aComponents.addAll(components);
-	      System.out.println(aComponents);
+		  List<AstMiddleWare> aAstMiddleWares=new ArrayList<AstMiddleWare>();
+	      AstMiddleWareAnalysiser speAssetLinux=new AstMiddleWareAnalysiser();
+	      Login login=new Login("10.108.226.63", "root","rootroot");
+	      List<AstMiddleWare> AstMiddleWares= speAssetLinux.middleWareFind((login));
+	      aAstMiddleWares.addAll(AstMiddleWares);
+	      System.out.println(aAstMiddleWares);
 	}
 	
 	 

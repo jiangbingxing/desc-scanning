@@ -10,8 +10,8 @@ public class LinuxCommand {
 	//版本
 	public final static String VERSION="cat /etc/redhat-release";
 	
-	//默认网关
-	public final static String DEFAULT_GATEWAY="ifconfig|grep Mask |awk '{print $3}'|head -1";
+	//获得子网掩码
+	public final static String MASK="ifconfig|grep Mask |awk '{print $3}'|head -1";
 	
 	//物理地址
 	public final static String MAC_ADDRESS="ifconfig|grep HWaddr|awk '{print $5}'|head -1";
@@ -23,11 +23,6 @@ public class LinuxCommand {
 	public  static String COMPONENT_USER="ps -ef | grep ";
 	//网卡地址
 	public final static String NET_CARD_ADDRESS="ifconfig";
-	//tomcat服务器主机地址发现
-	public final static String TOMCAT_PROCESS="ps -ef|grep tomcat|awk '{print $2}'";
-	//tomcat服务器主机地址发现
-		public final static String TOMCAT_ADDRESS="ps -ef|grep tomcat";
-	//tomcat服务器主机端口发现
-		public static String TOMCAT_PORT="netstat -tnulp |grep ";
-
+		//获得默认网关
+	public final static String GATE_WAY="cat /etc/resolv.conf |grep nameserver|awk '{print $2}'|head -1";
 }

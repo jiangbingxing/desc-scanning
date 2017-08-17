@@ -19,9 +19,16 @@ public class Component implements Serializable {
 	private String status;//开启状态
 	private String username;//正在使用该应用的账户          
 	private String appType; //应用的类型
-	private int result;
+	private int resultCode; //结果状态
 	
 	
+	
+	public int getResultCode() {
+		return resultCode;
+	}
+	public void setResultCode(int resultCode) {
+		this.resultCode = resultCode;
+	}
 	public String getUsername() {
 		return username;
 	}
@@ -69,15 +76,13 @@ public class Component implements Serializable {
 	public void setAppType(String appType) {
 		this.appType = appType;
 	}
-	public int getResult() {
-		return result;
+	@Override
+	public String toString() {
+		return "Component [name=" + name + ", path=" + path + ", version=" + version + ", port=" + port + ", status="
+				+ status + ", username=" + username + ", appType=" + appType + ", resultCode=" + resultCode + "]";
 	}
-	public void setResult(int success) {
-		this.result = success;
-	}
-
 	public Component(String name, String path, String version, int port, String status, String username, String appType,
-			int result) {
+			int resultCode) {
 		super();
 		this.name = name;
 		this.path = path;
@@ -86,13 +91,10 @@ public class Component implements Serializable {
 		this.status = status;
 		this.username = username;
 		this.appType = appType;
-		this.result = result;
+		this.resultCode = resultCode;
 	}
-	@Override
-	public String toString() {
-		return "Component [name=" + name + ", path=" + path + ", version=" + version + ", port=" + port + ", status="
-				+ status + ", username=" + username + ", appType=" + appType + ", result=" + result + "]";
-	}
+	
+
 
 	
 }

@@ -1,79 +1,82 @@
 package com.boco.desc.enty;
 
-import java.util.Arrays;
+import java.io.Serializable;
 
-public class Asset {
-	private String assetName; //资产名
-	private String manuFacturer;// 厂商
-	private String version;// 版本
-	private String assetType;// 资产类型
-	private String DefaultGateway; // 默认网关
-	private String MacAddres; //物理地址
-	private String ips[];//网卡地址
-	
-	public String[] getIps() {
-		return ips;
+
+
+
+public class Asset implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6758442773698512020L;
+	private String astName; //资产名
+	private String manageIp;//管理ip
+	private String astStatus;//资产状态
+	private Integer astTypeId1;
+	private Integer astTypeId2;
+	private String vendor;
+	private String astModel;
+	private String systemVersion;
+	public String getAstName() {
+		return astName;
 	}
-	public void setIps(String[] ips) {
-		this.ips = ips;
+	public void setAstName(String astName) {
+		this.astName = astName;
 	}
-	public String getAssetName() {
-		return assetName;
+	public String getManageIp() {
+		return manageIp;
 	}
-	public void setAssetName(String assetName) {
-		this.assetName = assetName;
+	public void setManageIp(String manageIp) {
+		this.manageIp = manageIp;
 	}
-	public String getManuFacturer() {
-		return manuFacturer;
+	public String getAstStatus() {
+		return astStatus;
 	}
-	public void setManuFacturer(String manuFacturer) {
-		this.manuFacturer = manuFacturer;
+	public void setAstStatus(String astStatus) {
+		this.astStatus = astStatus;
 	}
-	public String getVersion() {
-		return version;
+	public Integer getAstTypeId1() {
+		return astTypeId1;
 	}
-	public void setVersion(String version) {
-		this.version = version;
+	public void setAstTypeId1(Integer astTypeId1) {
+		this.astTypeId1 = astTypeId1;
 	}
-	public String getAssetType() {
-		return assetType;
+	public Integer getAstTypeId2() {
+		return astTypeId2;
 	}
-	public void setAssetType(String assetType) {
-		this.assetType = assetType;
+	public void setAstTypeId2(Integer astTypeId2) {
+		this.astTypeId2 = astTypeId2;
 	}
-	public String getDefaultGateway() {
-		return DefaultGateway;
+	public String getVendor() {
+		return vendor;
 	}
-	public void setDefaultGateway(String defaultGateway) {
-		DefaultGateway = defaultGateway;
+	public void setVendor(String vendor) {
+		this.vendor = vendor;
 	}
-	public String getMacAddres() {
-		return MacAddres;
+	public String getAstModel() {
+		return astModel;
 	}
-	public void setMacAddres(String macAddres) {
-		MacAddres = macAddres;
+	public void setAstModel(String astModel) {
+		this.astModel = astModel;
 	}
-	
-	public Asset() {
-		super();
+	public String getSystemVersion() {
+		return systemVersion;
 	}
+	public void setSystemVersion(String systemVersion) {
+		this.systemVersion = systemVersion;
+	}
+
 	@Override
 	public String toString() {
-		return "Asset [assetName=" + assetName + ", manuFacturer=" + manuFacturer + ", version=" + version
-				+ ", assetType=" + assetType + ", DefaultGateway=" + DefaultGateway + ", MacAddres=" + MacAddres
-				+ ", ips=" + Arrays.toString(ips) + "]";
+		return "Asset [astName=" + astName + ", manageIp=" + manageIp + ", astStatus=" + astStatus + ", astTypeId1="
+				+ astTypeId1 + ", astTypeId2=" + astTypeId2 + ", vendor=" + vendor + ", astModel=" + astModel
+				+ ", systemVersion=" + systemVersion + "]";
 	}
-	public Asset(String assetName, String manuFacturer, String version, String assetType, String defaultGateway,
-			String macAddres, String[] ips) {
-		super();
-		this.assetName = assetName;
-		this.manuFacturer = manuFacturer;
-		this.version = version;
-		this.assetType = assetType;
-		DefaultGateway = defaultGateway;
-		MacAddres = macAddres;
-		this.ips = ips;
-	}
+	
+	
+	
+	
 	
 	
 }

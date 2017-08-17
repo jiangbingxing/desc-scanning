@@ -7,7 +7,7 @@ public class IpAndCommod {
 	
 	
 	public IpAndCommod() {
-		this("127.0.0.1","-p 1-65355 -T4 -O","C:\\Program Files (x86)\\Nmap");
+		this("127.0.0.1","nmap -A","C:\\Program Files (x86)\\Nmap");
 	}
 	
 	public IpAndCommod(String ip, String path) {
@@ -41,8 +41,4 @@ public class IpAndCommod {
 		Commond = commond;
 	}
 	
-	
-	
-	
-
 }

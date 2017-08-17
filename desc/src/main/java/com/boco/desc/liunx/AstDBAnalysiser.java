@@ -4,42 +4,47 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.boco.desc.enty.Component;
+import com.boco.desc.enty.AstDB;
 import com.boco.desc.enty.Login;
+
 import com.boco.desc.util.CommandUtils;
 import com.boco.desc.util.LoadUtil;
+import com.boco.desc.version.AppType;
 import com.boco.sces.command.Command;
 import com.boco.sces.command.CommandImpl;
 import com.boco.sces.login.UserInfo;
 import com.boco.sces.result.Result;
-import com.sun.jndi.url.corbaname.corbanameURLContextFactory;
 
-public class ORACLEAssetLinux {
+
+
+public class AstDBAnalysiser {
 	
-	List<Component> com=new ArrayList<Component>();
-	Component coms=new Component("123","123","123",1,"123", null, null,1);
-	
-	
-	/*未安装应用的查找
+
+	/*数据库应用的查找
 	 * *
 	 */
 	 
-	public List<Component> tomcatCompoentFind(Login login) throws IOException
+	public List<AstDB> DBFind(Login login) throws IOException
 	 {
-		List<Component> com=new ArrayList<Component>();
-		Component coms=new Component("123","123","123",1,"123", null, null, 1);
-		com.add(coms);
-		 List<Component> components=new ArrayList<Component>();
+		List<AstDB> com=new ArrayList<AstDB>();	
+		 List<AstDB> astDBs=new ArrayList<AstDB>();
+		 
 		 //设置登录信息
 		 UserInfo userInfo = new UserInfo(login.getIp(),login.getPort(),
 				 login.getUsername(), login.getPassword());
 		 
 		 //从配置文件取回所有的未安装应用的 命令
-		 List<String> propertiesList=LoadUtil.LoadPreperties("speApplication.properties");
+		 List<String> propertiesList=LoadUtil.LoadPreperties("ast_db.properties");
+		 
 		 if(propertiesList!=null&&propertiesList.size()%2==0)
 			 
 			 for (int m = 0; m < propertiesList.size()/2; m++) {
-				 	
+				 
+			//获得未安装应用的名字
+				 String appName=propertiesList.get(2*m).split(" ")[2];
+				 
+				 
+				 //指令结果
 				 Result result1=null;
 				 Result result2=null;
 				 Result result3=null;				 
@@ -68,13 +73,13 @@ public class ORACLEAssetLinux {
 										 String[] pStrings=portString.split("\r\n");
 										 
 										 for (int j = 0; j < pStrings.length; j++) {
-											 Component component=new Component();
+											 AstDB astDB=new AstDB();
 											 String[] nativePorts=pStrings[j].split(":");
 											 String nativePort=nativePorts[nativePorts.length-1];
 											 if(nativePort!=null &&!nativePort.equals(" "));
 											 {
-											 component.setPort(Integer.parseInt(nativePort.trim()));
-											 components.add(component);
+											 astDB.setServerPort((Integer.parseInt(nativePort.trim())));
+											 astDBs.add(astDB);
 											 }
 										 }
 										 }
@@ -104,20 +109,22 @@ public class ORACLEAssetLinux {
 						 String[] pathStrings=result3.getMessage().split(".home=");
 						 if(pathStrings!=null&&pathStrings.length>1)
 						 {
-					     String username=pathStrings[0].split(" ")[0];
+					     //String username=pathStrings[0].split(" ")[0];
 						 String path=pathStrings[1].split(" ")[0];
-						 for (int i = 0; i < components.size(); i++) {
-							components.get(i).setPath(path);
-							components.get(i).setUsername(username);
-							components.get(i).setStatus("open");
-							components.get(i).setName("tomcat");
+						 for (int i = 0; i < astDBs.size(); i++) {
+								astDBs.get(i).setInstallPath(path);;
+								astDBs.get(i).setAstStatus("open");
+								astDBs.get(i).setAstName(appName);
+								astDBs.get(i).setManageIp(login.getIp());
+								astDBs.get(i).setAstTypeId1(AppType.MINDDLEWARE);
+								
 						}
 						 }
 						 else {
 							return com;
 						}
 					 }
-					    return components;                
+					    return astDBs;                
 					 
 				 } catch (Exception e) {
 					 e.printStackTrace();
@@ -129,12 +136,12 @@ public class ORACLEAssetLinux {
 	}
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		List<Component> aComponents=new ArrayList<Component>();
-	     ORACLEAssetLinux speAssetLinux=new ORACLEAssetLinux();
-	     Login login=new Login("10.101.167.174", "root","rootroot");
-	      List<Component> components= speAssetLinux.tomcatCompoentFind((login));
-	      aComponents.addAll(components);
-	      System.out.println(aComponents);
+		  List<AstDB> aastDBs=new ArrayList<AstDB>();
+	      AstDBAnalysiser speAssetLinux=new AstDBAnalysiser();
+	      Login login=new Login("10.108.226.63", "root","rootroot");
+	      List<AstDB> astDBs= speAssetLinux.DBFind((login));
+	      aastDBs.addAll(astDBs);
+	      System.out.println(aastDBs);
 	}
 	
 	 

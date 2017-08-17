@@ -8,28 +8,30 @@ import org.jsoup.Jsoup;
 import org.nmap4j.Nmap4j;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
-
 import com.boco.desc.analysis.Analysiser;
 import com.boco.desc.analysis.BaseAsset;
-import com.boco.desc.enty.Asset;
-import com.boco.desc.enty.BaseScanning;
-import com.boco.desc.enty.Component;
+import com.boco.desc.dto.LoginScanning;
+import com.boco.desc.dto.NmapScanning;
+import com.boco.desc.enty.AstDB;
+import com.boco.desc.enty.AstHost;
+import com.boco.desc.enty.AstMiddleWare;
+import com.boco.desc.enty.AstSoftWare;
+import com.boco.desc.enty.BaseNmap;
+
 import com.boco.desc.enty.IpAndCommod;
 import com.boco.desc.enty.Login;
-import com.boco.desc.result.Result;
+import com.boco.desc.result.ResultCode;
 import com.boco.desc.util.LoadUtil;
 
 
 public class LinuxAnalysiser implements Analysiser{
 	
 
-	private BaseScanning single=new BaseScanning();
+	private LoginScanning loginScanning=new LoginScanning();
 	private BaseAsset baseAssetLinux=null;
 
-	
 
-
-	public  BaseScanning SingleScanning(String output,Login login) {
+	public  LoginScanning getLoginScanning(String output,Login login) {
 		/*
 		 * 1.使用远程登录，先从回显中获得系统版本名
 		 * 2.通过得到的不同的OS，进行不同的命令调度
@@ -55,76 +57,101 @@ public class LinuxAnalysiser implements Analysiser{
 		org.jsoup.nodes.Document doc = Jsoup.parse(output); 
 		org.jsoup.select.Elements links = doc.getElementsByTag("port");
 		
-		List<Component> components=new ArrayList<Component>();
+		List<AstSoftWare> astSoftWares=new ArrayList<AstSoftWare>();
 		for(int i=0;i<links.size();i++)
 		{
-			Component component=new Component();
-			component.setName(links.get(i).getElementsByTag("service").attr("name"));
-			component.setPort(Integer.parseInt(links.get(i).attr("portid")));
-			component.setStatus(links.get(i).getElementsByTag("state").attr("state"));
-			if(component.getName()!=null &&!component.getName().equals(""))
+			AstSoftWare astSoftWare=new AstSoftWare();
+			astSoftWare.setAstName((links.get(i).getElementsByTag("service").attr("name")));
+			astSoftWare.setServerPort(Integer.parseInt(links.get(i).attr("portid")));
+			astSoftWare.setAstStatus(links.get(i).getElementsByTag("state").attr("state"));
+			astSoftWare.setSystemVersion((links.get(i).getElementsByTag("service").attr("product")+links.get(i).getElementsByTag("service").attr("version")));
+			if(astSoftWare.getAstName()!=null &&!astSoftWare.getAstName().equals(""))
 			{
 				
-				String string=baseAssetLinux.getPathAndUser(login, component.getName());
+				String string=baseAssetLinux.getPathAndUser(login,astSoftWare.getAstName());
+				if(string.equals("102"))
+				{
+					loginScanning.setResultCode(ResultCode.LOGIN_FAIL);
+				}
+				else
+				{
 				String[]strings=string.split("星星");
-				component.setPath(strings[0]);
-				component.setUsername(strings[1]);
-				component.setResult(Result.SUCCESS);
-				
+				astSoftWare.setInstallPath((strings[0]));
+				astSoftWare.setInstallUser((strings[1]));	
+				loginScanning.setResultCode(ResultCode.NMAP_LOGIN_SUCCESS);
+				}
+							
 			}
 			
-			components.add(component);
+			astSoftWares.add(astSoftWare);
+			loginScanning.setAstSoftWares(astSoftWares);
 			
 		}
 		
 		
-		//未安装应用资产发现
-		TomcatAssetLinux speAssetLinux=new TomcatAssetLinux();
+		//数据库应用资产发现
+		AstDBAnalysiser astDBAnalysiser=new AstDBAnalysiser();
 		try {
-			List<Component> speComponents=speAssetLinux.tomcatCompoentFind(login);
+			List<AstDB> astDBs=astDBAnalysiser.DBFind(login);
+			if(astDBs!=null&& astDBs.size()>0)
+		     {
+				for (int i = 0; i < astDBs.size(); i++) {
+					astDBs.get(i).setManageIp(login.getIp());
+				}
+				loginScanning.setAstDBs(astDBs);
+		     }
 			
-			components.addAll(speComponents);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//中间件应用资产发现
+		AstMiddleWareAnalysiser astMiddleWareAnalysiser=new AstMiddleWareAnalysiser();
+		try {
+			List<AstMiddleWare> astMiddleWares=astMiddleWareAnalysiser.middleWareFind(login);
+			if(astMiddleWares!=null&& astMiddleWares.size()>0)
+		     {
+				for (int i = 0; i < astMiddleWares.size(); i++) {
+					astMiddleWares.get(i).setManageIp(login.getIp());
+				}
+				loginScanning.setAstMiddleWares(astMiddleWares);
+		     }
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//设置组件信息
-		single.setActiveIp(login.getIp());
-		
-		single.setComponent(components);
-		
-		//设置资产信息
-		Asset asset=baseAssetLinux.getBaseAsset(login);
-		
-		single.setCardIp(asset.getIps());
-		
-		single.setAssetName(asset.getAssetName());
-		single.setAssetType(asset.getAssetType());
-		single.setDefaultGateway(asset.getDefaultGateway());
-		single.setMacAddres(asset.getMacAddres());
-		single.setManuFacturer(asset.getManuFacturer());
-		single.setVersion(asset.getVersion());
 		
 		
+		//设置主机资产信息
+	    AstHost astHost=baseAssetLinux.getBaseAsset(login);
+	    if(astHost!=null)
+	    {
+	    
+		loginScanning.setAstHosts(astHost);
+		
+		loginScanning.setResultCode(ResultCode.NMAP_LOGIN_SUCCESS);
+		
+	    }
+	    else {
+			loginScanning.setResultCode(ResultCode.LOGIN_FAIL);
+		}
 		
 		
-		return single;	
+		return loginScanning;	
 
 	}
 
-
-
-
-	@Override
-	public List<Component> NmapScanning(String ip) {
-		// TODO Auto-generated method stub
+	
+	public NmapScanning getNmapScanning(String ip) {
+		NmapScanning nmapScanning=new NmapScanning();
+	
 		String path=LoadUtil.getNmapPath();
 		IpAndCommod ic=new IpAndCommod();
 		Nmap4j nmap4j = new Nmap4j(path);
 		nmap4j.addFlags(ic.getCommond());
-		nmap4j.includeHosts(ip) ;
+		nmap4j.includeHosts(ip);
 		try {
 			nmap4j.execute();
 			if( !nmap4j.hasError() ) {
@@ -138,26 +165,45 @@ public class LinuxAnalysiser implements Analysiser{
 				//把得到的output对象封装成baseScanning类
 				org.jsoup.nodes.Document doc = Jsoup.parse(output); 
 				org.jsoup.select.Elements links = doc.getElementsByTag("port");
-
-				List<Component> components=new ArrayList<Component>();
+             if(!doc.getElementsByTag("port").attr("portid").equals(""))
+             {
+				List<BaseNmap> baseNmaps=new ArrayList<BaseNmap>();
 				for(int i=0;i<links.size();i++)
 				{
-					Component component=new Component();
-					component.setName(links.get(i).getElementsByTag("service").attr("name"));
-					component.setPort(Integer.parseInt(links.get(i).attr("portid")));
-					component.setStatus(links.get(i).getElementsByTag("state").attr("state"));
-					components.add(component);
+					BaseNmap baseNmap=new BaseNmap();
+					
+					baseNmap.setServiceName((links.get(i).getElementsByTag("service").attr("name")));
+					baseNmap.setPort(Integer.parseInt(links.get(i).attr("portid")));
+					baseNmap.setState(links.get(i).getElementsByTag("state").attr("state"));
+					baseNmap.setPortProtocol(links.get(i).attr("protocol"));
+					baseNmap.setVersion(links.get(i).getElementsByTag("service").attr("product")+links.get(i).getElementsByTag("service").attr("version"));
+					baseNmaps.add(baseNmap);
 				}
-				return components;
+				nmapScanning.setBaseNmaps(baseNmaps);
+				nmapScanning.setOS(doc.getElementsByTag("osclass").attr("osfamily"));
+				if(nmapScanning!=null &&baseNmaps.size()>0)
+				nmapScanning.setResultCode(ResultCode.NMAP_SUCCESS);
+				return nmapScanning;
+			}
+             else {
+            	 nmapScanning.setResultCode(ResultCode.NMAP_FAIL);
+				return  nmapScanning;
+			}
 			}
 				} catch (NMapInitializationException e) {
 					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
+					 nmapScanning.setResultCode(ResultCode.NMAP_FAIL);
+					return nmapScanning;
+				 
 				} catch (NMapExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					 nmapScanning.setResultCode(ResultCode.NMAP_FAIL);
+						return nmapScanning;
 				}
-				return null;
+				return nmapScanning;
 			}
 
    }

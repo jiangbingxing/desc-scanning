@@ -1,20 +1,20 @@
 package com.boco.desc.liunx;
 
-import com.boco.desc.analysis.BaseAsset;
-import com.boco.desc.enty.Asset;
+import java.util.Arrays;
 
+import com.boco.desc.analysis.BaseAsset;
+
+import com.boco.desc.enty.AstHost;
 import com.boco.desc.enty.Login;
 import com.boco.desc.util.CommandUtils;
 import com.boco.sces.command.Command;
 import com.boco.sces.command.CommandImpl;
 import com.boco.sces.login.UserInfo;
 import com.boco.sces.result.Result;
-
-
 public class BaseAssetLinuxImpl2 implements BaseAsset{
 
-     Asset resouce=new Asset();
-	public Asset getBaseAsset(Login login) {
+     AstHost resouce=new AstHost();
+	public AstHost getBaseAsset(Login login) {
 		// TODO Auto-generated method stub
 		try {
 			// 主机的IP,端口，登录账号，密码
@@ -29,7 +29,7 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 			
 			if(result1.getCode()==0)
 			{
-	                resouce.setAssetName(result1.getMessage().trim());
+	                resouce.setAstName(result1.getMessage().trim());
 			}
 			
 			
@@ -40,7 +40,7 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 				
 				if(result2.getCode()==0 &&result2.getMessage()!=null)
 				{
-					resouce.setAssetType(result2.getMessage().trim());
+					resouce.setAstModel(result2.getMessage().trim());
 				}
 			
 			//获得厂商
@@ -49,7 +49,7 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 	
 			if(result3.getCode()==0)
 			{
-			resouce.setManuFacturer(result3.getMessage().trim());
+			resouce.setVendor(result3.getMessage().trim());
 			}
 			
 			//获得版本号
@@ -58,16 +58,16 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 			
 			if(result4.getCode()==0)
 			{
-		    resouce.setVersion(result4.getMessage().trim());
+		    resouce.setSystemVersion(result4.getMessage().trim());
 			}
 			
 			//获得默认网关
-			Command command5= new CommandImpl(LinuxCommand2.DEFAULT_GATEWAY);//指令
+			Command command5= new CommandImpl(LinuxCommand2.MASK);//指令
 			Result result5= CommandUtils.execute(userInfo, command5);
 		
 			if(result5.getCode()==0){
 				
-		            resouce.setDefaultGateway( result5.getMessage().trim());
+		            resouce.setMask(result5.getMessage().trim());
 			}
 			
 			
@@ -80,7 +80,7 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 			{
 			String[] string3=result6.getMessage().split("ether ");
 			String[] string4=string3[1].split(" ");
-			resouce.setMacAddres(string4[0].trim());
+			resouce.setMac(string4[0].trim());
 			}
 			
 			//获得不同的网卡地址
@@ -89,19 +89,35 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 			if(result7.getCode()==0)
 			{
 			String [] netCard=result7.getMessage().split("inet ");
-			String[] netcard2=new String[netCard.length-1];
+			String[] netcard2=new String[netCard.length-2];
 			
-			for(int i=0;i<netCard.length-1;i++)
+			for(int i=0;i<netCard.length-2;i++)
 			{
 				
-				String[] string1=netCard[i+1].split(" ");
+				String[] string1=netCard[i+2].split(" ");
 				String ip1=string1[0].trim();
 			    netcard2[i]=ip1;
 				
 			}
-			resouce.setIps(netcard2);
+			resouce.setIpCard(Arrays.asList(netcard2));
 			
 			}	
+			//获得主机的默认网关
+			Command command8= new CommandImpl(LinuxCommand2.GATE_WAY);
+			Result result8= CommandUtils.execute(userInfo, command8);
+			if(result8.getCode()==0)
+			{
+			
+			     resouce.setGateway(result8.getMessage().trim());
+				
+			}
+			//获得主机的广播地址
+			Command command9= new CommandImpl(LinuxCommand2.BROADCAST);
+			Result result9= CommandUtils.execute(userInfo, command9);
+			if(result9.getCode()==0)
+			{
+				resouce.setBcast(result9.getMessage().trim());
+			}
 			userInfo.logout();
 			
 			
@@ -161,8 +177,7 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("登录超时或无数据");
-			return "登录超时或无数据@[登录超时或无数据";
+			return "102";
 		}
 		String resString=pathString+" 星星"+userString;
 		

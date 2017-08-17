@@ -1,33 +1,28 @@
 package com.boco.desc;
 
 
-
-
-import java.util.List;
-
+import org.nmap4j.Nmap4j;
+import org.nmap4j.core.nmap.NMapExecutionException;
+import org.nmap4j.core.nmap.NMapInitializationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.boco.desc.analysis.OSCheck;
-import com.boco.desc.enty.BaseScanning;
-import com.boco.desc.enty.Component;
+import com.boco.desc.dto.LoginScanning;
+import com.boco.desc.dto.NmapScanning;
 import com.boco.desc.enty.IpAndCommod;
 import com.boco.desc.enty.Login;
 import com.boco.desc.liunx.LinuxAnalysiser;
+import com.boco.desc.util.LoadUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
-
 @RestController
-public class Scanning {
+public class ScanningBoot {
        
 	private LinuxAnalysiser linuxAnalysiser=null;
 	private OSCheck OSCheck=null;
-	
-	
-	
-	
+
 	@RequestMapping("/getBaseAst")
 	String getBaseAst(String ip,String username,String password)
 	{
@@ -37,12 +32,11 @@ public class Scanning {
 		Login login=new Login(ip,username, password);
 		
 		OSCheck=new OSCheck();
-		BaseScanning baseScanning=OSCheck.OSAnalysiser(ipAndCommod, login);
+		LoginScanning baseScanning=OSCheck.OSAnalysiser(ipAndCommod, login);
 		
 		//把对象解析成字符串
 		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	    String single=gson.toJson(baseScanning);
-		System.out.println(single);		
 	
 		return single.toString();
 		
@@ -54,11 +48,37 @@ public class Scanning {
 	String getNmapScanning(String ip)
 	{
 		linuxAnalysiser=new LinuxAnalysiser();
-	  List<Component> components=linuxAnalysiser.NmapScanning(ip);
+	  NmapScanning baseScanning=linuxAnalysiser.getNmapScanning(ip);
 	  Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-	    String component=gson.toJson(components);
-		return component;
+	    String base=gson.toJson(baseScanning);
+		return base;
 		
 	}
+	
+	@RequestMapping("/getNmapTest")
+	public String getNmapTest(String ip,String commond)
+	{
+		String output=null;
+		String path=LoadUtil.getNmapPath();
+		Nmap4j nmap4j = new Nmap4j(path);
+		nmap4j.addFlags(commond);
+		nmap4j.includeHosts(ip);
+	
+			try {
+				nmap4j.execute();
+			} catch (NMapInitializationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NMapExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if( !nmap4j.hasError() ) {
 
-}
+			output = nmap4j.getOutput();
+		
+	}
+			  return output;
+	}
+	     
+	}

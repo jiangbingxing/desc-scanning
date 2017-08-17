@@ -1,10 +1,11 @@
 package com.boco.desc.liunx;
 
 
+import java.util.Arrays;
 
 import com.boco.desc.analysis.BaseAsset;
-import com.boco.desc.enty.Asset;
 
+import com.boco.desc.enty.AstHost;
 import com.boco.desc.enty.Login;
 import com.boco.desc.util.CommandUtils;
 import com.boco.sces.command.Command;
@@ -12,11 +13,10 @@ import com.boco.sces.command.CommandImpl;
 import com.boco.sces.login.UserInfo;
 import com.boco.sces.result.Result;
 
-
 public class BaseAssetLinuxImpl implements BaseAsset{
 
-     Asset resouce=new Asset();
-	public Asset getBaseAsset(Login login) {
+     AstHost resouce=new AstHost();
+	public AstHost getBaseAsset(Login login) {
 		// TODO Auto-generated method stub
 		try {
 			// 主机的IP,端口，登录账号，密码
@@ -31,7 +31,7 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 			
 			if(result1.getCode()==0)
 			{
-	                resouce.setAssetName(result1.getMessage().trim());
+	                resouce.setAstName((result1.getMessage().trim()));
 			}
 			
 			
@@ -44,12 +44,12 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 				{
 					if(result2.getMessage().trim().equals("CentOS"))
 					{
-				     resouce.setAssetType(result2.getMessage().trim());
+				     resouce.setAstModel((result2.getMessage().trim()));
 					}
 				 if(result2.getMessage()=="Red")
 				 {
 					 String temp=result2.getMessage()+" Har";
-					 resouce.setAssetType(temp);
+					 resouce.setAstModel(temp);
 				 }
 				}
 			
@@ -59,7 +59,7 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 	
 			if(result3.getCode()==0)
 			{
-			resouce.setManuFacturer(result3.getMessage().trim());
+			resouce.setVendor((result3.getMessage().trim()));
 			}
 			
 			//获得版本号
@@ -68,16 +68,16 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 			
 			if(result4.getCode()==0)
 			{
-		    resouce.setVersion(result4.getMessage().trim());
+		    resouce.setSystemVersion((result4.getMessage().trim()));
 			}
 			
-			//获得默认网关
-			Command command5= new CommandImpl(LinuxCommand.DEFAULT_GATEWAY);//指令
+			//获得子网掩码
+			Command command5= new CommandImpl(LinuxCommand.MASK);//指令
 			Result result5= CommandUtils.execute(userInfo, command5);
 		
 			if(result5.getCode()==0&& result5.getMessage()!=null){
                       String mask=result5.getMessage().split(":")[1];				
-		            resouce.setDefaultGateway(mask);
+		            resouce.setMask(mask);
 			}
 			
 			
@@ -88,7 +88,7 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 			//解析mac地址
 			if(result6.getCode()==0 &&result6.getMessage()!=null)
 			{
-				resouce.setMacAddres(result6.getMessage().trim());
+				resouce.setMac(result6.getMessage().trim());
 		
 			}
 			
@@ -98,30 +98,39 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 			if(result7.getCode()==0)
 			{
 			String [] netCard=result7.getMessage().split("inet addr:");
-			String[] netcard2=new String[netCard.length-1];
+			String[] netcard2=new String[netCard.length-2];
 			
-			for(int i=0;i<netCard.length-1;i++)
+			for(int i=0;i<netCard.length-2;i++)
 			{
 				
-				String[] string1=netCard[i+1].split(" ");
+				String[] string1=netCard[i+2].split(" ");
 				String ip1=string1[0].trim();
 			    netcard2[i]=ip1;
 				
 			}
-			resouce.setIps(netcard2);
+			resouce.setIpCard(Arrays.asList(netcard2));;
 			
 			}
 			
 			
-     
-			userInfo.logout();
+			//获得主机的默认网关
+			Command command8= new CommandImpl(LinuxCommand.GATE_WAY);
+			Result result8= CommandUtils.execute(userInfo, command8);
+			if(result8.getCode()==0)
+			{
+				
+			     resouce.setGateway(result8.getMessage().trim());
+				
+			}
 			
+			userInfo.logout();
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			
 			e.printStackTrace();
 			System.out.println("账号或密码不对");
+			
 		}
 		
 		return resouce;
@@ -173,8 +182,7 @@ public class BaseAssetLinuxImpl implements BaseAsset{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("登录超时或无数据");
-			return "登录超时或无数据@[登录超时或无数据";
+			return "102";
 		}
 		String resString=pathString+" 星星"+userString;
 		
