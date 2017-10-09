@@ -1,20 +1,19 @@
 package com.boco.desc.analysis;
 
 
+import java.util.List;
 
-import com.boco.desc.dto.LoginScanning;
-import com.boco.desc.dto.NmapScanning;
-import com.boco.desc.enty.Login;
-
+import org.jsoup.select.Elements;
 
 
-	
-public interface Analysiser {
 
-	LoginScanning getLoginScanning(String output,Login login);
-	NmapScanning getNmapScanning(String ip);
+import com.google.gson.JsonObject;
+
+public abstract class Analysiser {
+	public String totalString;
+	public String portString;
 	
-	
-	
-	
+	public abstract List<JsonObject> Find(Elements elements);
+
+
 }

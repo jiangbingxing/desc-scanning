@@ -1,5 +1,7 @@
 package com.boco.desc.enty;
 
+import com.asiainfo.uap.util.des.EncryptInterface;
+
 public class Login {
 	private String ip;
 	private String username;
@@ -37,14 +39,18 @@ public class Login {
 		this.password = password;
 	}
 	public Login(String ip, String username, String password) {
-		this(ip, username, 22, password);
+		
+		this(ip, username, 22,password);
 	}
-	public Login(String username, String password) {
-		super();
-		this.username = username;
-		this.password = password;
+ 
+	public void Decrypt()
+	{
+		setPassword(EncryptInterface.desUnEncryptData(password));
 	}
-	
+	@Override
+	public String toString() {
+		return "Login [ip=" + ip + ", username=" + username + ", port=" + port + ", password=" + password + "]";
+	}
 	
 
 }

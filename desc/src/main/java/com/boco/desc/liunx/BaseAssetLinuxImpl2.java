@@ -1,24 +1,15 @@
 package com.boco.desc.liunx;
 
-import java.util.Arrays;
 
-import com.boco.desc.analysis.BaseAsset;
-
-import com.boco.desc.enty.AstHost;
-import com.boco.desc.enty.Login;
-import com.boco.desc.util.CommandUtils;
-import com.boco.sces.command.Command;
-import com.boco.sces.command.CommandImpl;
-import com.boco.sces.login.UserInfo;
-import com.boco.sces.result.Result;
-public class BaseAssetLinuxImpl2 implements BaseAsset{
-
+public class BaseAssetLinuxImpl2 {
+	/*private static Logger logger = Logger.getLogger(BaseAssetLinuxImpl2.class);
      AstHost resouce=new AstHost();
 	public AstHost getBaseAsset(Login login) {
 		// TODO Auto-generated method stub
+		UserInfo userInfo=null;
 		try {
 			// 主机的IP,端口，登录账号，密码
-			UserInfo userInfo = new UserInfo(login.getIp(),login.getPort(),
+		userInfo = new UserInfo(login.getIp(),login.getPort(),
 					login.getUsername(), login.getPassword());
 			
 			
@@ -118,13 +109,18 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 			{
 				resouce.setBcast(result9.getMessage().trim());
 			}
-			userInfo.logout();
+			
 			
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 			System.out.println("账号或密码不对");
+			logger.error("the password is erro or the network no connection");
+			return null;
+		}
+		finally {
+			
 		}
 		
 		return resouce;
@@ -177,7 +173,8 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "102";
+			logger.error("the password is erro or the network no connection");
+			return null;
 		}
 		String resString=pathString+" 星星"+userString;
 		
@@ -190,5 +187,5 @@ public class BaseAssetLinuxImpl2 implements BaseAsset{
 		String cString="CentOS";
 		System.out.println(cString.equals("CentOS"));
 	}
-      
+      */
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scanning>
+<os name="Linux"  >
+<host class="com.boco.desc.linux.host.HostScanning" method="find"  astType="主机">
+<property name="Host_Name"  command="uname -n"/>
+<property name="Host_VendorName"  command="uname"/>
+<property name="Host_ModelType"  command="cat /etc/redhat-release"/>
+<property name="Host_Version"  command1="cat /etc/redhat-release" command2="cat /etc/issue " command3="lsb_release -a"/>
+<property name="Host_Mask"  command="/sbin/ifconfig"/>
+<property name="Host_MAC"  command="/sbin/ifconfig"/>
+<property name="Host_Bcast"  command="/sbin/ifconfig"/>
+<property name="Host_Gateway"  command="netstat -rn |awk '{print $2}'"/>
+<property name="Host_IpList"  command="/sbin/ifconfig"/>
+</host>
+<middlewave class="com.boco.desc.linux.middlewave" method="find"  command="sudo netstat -tnulp|grep " astType="中间件" property1="Process_UserName" property2="Process_ListenPort" property3="Process_InstallPath" property4="Process_Id" >
+<component name="tomcat"      command1="ps -ef |grep tomcat" />
+<component name="apache"      command1="ps -ef |grep apache|grep -v tomcat" />
+<component name="weblogic"    command1="ps -ef |grep webLogic" />
+<component name="websphere"   command1="ps -ef |grep webSphere"/>
+<component name="iss"         command1="ps -ef |grep iss" />
+</middlewave>
+<db  class="com.boco.desc.linux.db" method="find" command="sudo netstat -tnulp|grep "  
+astType="数据库"  property1="Process_UserName" property2="Process_ListenPort"
+ property3="Process_InstallPath" property4="Process_Id" property5="ORACLE_SID_NAME" property6="ORACLE_HOME">
+<component name="mysql" command1="ps -ef |grep mysql"/>
+<component name="oracle"  command1="ps -ef |grep oracle" command2=" sudo cat  ${`ps -ef|grep oracle | grep tnslsnr|grep -v grep|awk '{print $8}'`%bin*}/network/admin/listener.ora" />
+<component name="sqlserver"  command1="ps -ef |grep sqlserver" />
+</db>
+<bdComponent  class="com.boco.desc.linux.bdcomponent"  astType="大数据组件" method="find" command="sudo netstat -tnulp|grep" property1="Process_UserName" property2="Process_ListenPort" property3="Process_InstallPath" property4="Process_Id" property5="id">
+<component name="flume"    command1="ps -ef |grep flume"   datatype1="控制节点"  command2="ps -ef |grep MonitorServer"  datatype2="控制节点"/>
+<component name="gbase"    command1="ps -ef |grep corosync" datatype1="控制节点"  command2="ps -ef |grep gbased" datatype2="数据节点" />
+<component name="hbase"    command1="ps -ef |grep Hmaster"  datatype1="控制节点" command2="ps -ef |grep RegionServer" datatype2="数据节点"/>
+<component name="hdfs"     command1="ps -ef |grep NameNode"   datatype1="控制节点" command2="ps -ef |grep Datanode" datatype2="数据节点"/>
+<component name="hive"     command1="ps -ef |grep HiveService"  datatype1="控制节点" command2="ps -ef |grep HiveMetaStore"  datatype2="控制节点"/>
+<component name="impala"   command1="ps -ef |grep Impalad" datatype1="控制节点" />
+<component name="kafka"    command1="ps -ef |grep Broker" datatype1="控制节点" command2="ps -ef |grep Producer"/>
+<component name="redis"    command1="ps -ef |grep redis-server" datatype1="控制节点"/>
+<component name="spark"    command1="ps -ef |grep JobHistory" datatype1="控制节点" command2="ps -ef |grep JDBCServer" datatype2="控制节点"/>
+<component name="yarn"     command1="ps -ef |grep ResourceManager"  datatype1="控制节点" command2="ps -ef |grep NodeManager" datatype2="数据节点"/>
+<component name="zookeeper" command1="ps -ef |grep quorumpeer" datatype1="控制节点"/>
+</bdComponent>
+
+</os>
+</scanning>
+
+
+
+
+

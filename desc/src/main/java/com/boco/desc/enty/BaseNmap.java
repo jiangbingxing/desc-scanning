@@ -1,58 +1,34 @@
 package com.boco.desc.enty;
 
-import java.io.Serializable;
-
-public class BaseNmap implements Serializable{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1562628676397215575L;
-  
-	private Integer port;
-	private String serviceName;
-	private String version;
-	private String portProtocol;
-	private String state;
-	
-	public Integer getPort() {
-		return port;
-	}
-	public void setPort(Integer port) {
-		this.port = port;
-	}
+public class BaseNmap {
+	private String ServiceName;
+	private Integer Port;
+	private String State;
+	private String PortProtocol;
 	public String getServiceName() {
-		return serviceName;
+		return ServiceName;
 	}
 	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
+		ServiceName = serviceName;
 	}
-	public String getVersion() {
-		return version;
+	public Integer getPort() {
+		return Port;
 	}
-	public void setVersion(String version) {
-		this.version = version;
-	}
-	public String getPortProtocol() {
-		return portProtocol;
-	}
-	public void setPortProtocol(String portProtocol) {
-		this.portProtocol = portProtocol;
+	public void setPort(Integer port) {
+		Port = port;
 	}
 	public String getState() {
-		return state;
+		return State;
 	}
 	public void setState(String state) {
-		this.state = state;
+		State = state;
 	}
-	@Override
-	public String toString() {
-		return "BaseNmap [port=" + port + ", serviceName=" + serviceName + ", version=" + version + ", portProtocol="
-				+ portProtocol + ", state=" + state + "]";
+	public String getPortProtocol() {
+		return PortProtocol;
 	}
-	
-	
-	
-	
+	public void setPortProtocol(String portProtocol) {
+		PortProtocol = portProtocol;
+	}
 	
 }
+

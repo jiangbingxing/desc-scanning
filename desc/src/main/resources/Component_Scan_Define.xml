@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Component_Scan_Define>
+
+  <ComponentType  typeName="主机">
+    <Component typeName="Linux">
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          echo "查看主机名称";
+          uname -n 
+          
+          ]]>
+        </CommandText>
+        <Property PropertyName="Host_Name" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Common"  ParseMethod="Parse_HostName"> </Property>
+      </PropertyDefine>
+      
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          
+          echo "厂家、型号、版本";
+          
+          echo "方式一";
+          cat /etc/issue ;
+          
+           echo "方式二";
+          lsb_release -a;
+             
+          ]]>
+        </CommandText>
+        <Property PropertyName="Host_VendorName" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Linux"  ParseMethod="Parse_Host_VendorName"> </Property>
+        <Property PropertyName="Host_ModelType" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Linux"  ParseMethod="Parse_Host_ModelType"></Property>
+        <Property PropertyName="Host_Version" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Linux"  ParseMethod="Parse_Host_Version"></Property> 
+      </PropertyDefine>
+
+
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          
+          echo "查看网络配置";
+            ifconfig 
+            
+          ]]>
+        </CommandText>
+        <Property PropertyName="Host_Mask" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Common"  ParseMethod="Parse_Host_Mask"> </Property>
+        <Property PropertyName="Host_MAC" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Common"  ParseMethod="Parse_Host_MAC"></Property>
+        <Property PropertyName="Host_IpList" ParseClass="com.boco.Component_Scan.ComponetParse.Host.Common"  ParseMethod="Parse_Host_IpList"></Property>
+      </PropertyDefine>
+      
+      
+    </Component>
+  </ComponentType>
+  
+  <ComponentType  typeName="中间件"> 
+    <Component typeName="tomcat">
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          echo "查看tomcat进程信息";
+          ps -ef|grep tomcat | grep -v grep
+          
+          echo "查看tomcat进程 监听端口";
+          for i in $(ps -ef|grep tomcat | grep -v grep );
+            do
+              echo "tomcat进程 : "  $i "的监听端口";
+              sudo netstat -tnulp|grep $i; 
+            done
+          ]]>
+        </CommandText>
+        <Property PropertyName="Process_Id" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_Id"> </Property>
+        <Property PropertyName="Process_UserName" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_UserName"></Property>
+        <Property PropertyName="Process_InstallPath" ParseClass="com.boco.Component_Scan.ComponetParse.tomcat"  ParseMethod="Process_InstallPath"></Property>
+        <Property PropertyName="Process_ListenPort" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Process_ListenPort"></Property>
+      </PropertyDefine>
+    </Component>
+
+    <Component typeName="apache">
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          echo "查看apache进程信息";
+          ps -ef|grep apache |grep -v tomcat | grep -v grep
+          
+          echo "查看apache进程 监听端口";
+          for i in $(ps -ef|grep apache |grep -v tomcat | grep -v grep );
+            do
+              echo "apache进程 : "  $i "的监听端口";
+              sudo netstat -tnulp|grep $i; 
+            done
+          ]]>
+        </CommandText>
+        <Property PropertyName="Process_Id" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_Id"> </Property>
+        <Property PropertyName="Process_UserName" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_UserName"></Property>
+        <Property PropertyName="Process_InstallPath" ParseClass="com.boco.Component_Scan.ComponetParse.apache"  ParseMethod="Process_InstallPath"></Property>
+        <Property PropertyName="Process_ListenPort" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Process_ListenPort"></Property> 
+      </PropertyDefine>
+    </Component> 
+  </ComponentType>
+
+  <ComponentType  typeName="数据库"> 
+    <Component typeName="oracle">
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          echo "查看oracle进程信息";
+          ps -ef|grep oracle | grep tnslsnr|grep -v grep
+          
+          echo "查看oracle的 SID_NAME和 GLOBAL_DBNAME 和ORACLE_HOME";
+          sid=$( ps -ef|grep oracle | grep tnslsnr|grep -v grep|awk '{print $8}')
+          sudo cat  ${sid%bin*}/network/admin/listener.ora
+          
+          
+          echo "查看oracle的 端口;"
+          --使用SID_NAME对应的值，匹配tnsnames.ora文件中的内容，找到对应的连接串中的端口；
+          port=$(sudo cat ${sid%bin*}/network/admin/listener.ora)
+          
+          echo ${port#*'ORACLE_HOME ='}|while read i
+            do
+              echo ${i%%')'*}|while read n 
+                do 
+                  sudo cat $n/network/admin/tnsnames.ora
+                done
+            done 
+          
+          ]]>
+        </CommandText>
+        <Property PropertyName="Process_Id" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_Id"> </Property>
+        <Property PropertyName="Process_UserName" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_UserName"></Property>
+        <Property PropertyName="ORACLE_HOME" ParseClass="com.boco.Component_Scan.ComponetParse.oracle"  ParseMethod="Process_ORACLE_HOME"></Property>
+        <Property PropertyName="ORACLE_SID_NAME" ParseClass="com.boco.Component_Scan.ComponetParse.oracle"  ParseMethod="Process_ORACLE_SID_NAME"></Property>
+        <Property PropertyName="Oracle_GLOBAL_DBNAME" ParseClass="com.boco.Component_Scan.ComponetParse.oracle"  ParseMethod="Process_Oracle_GLOBAL_DBNAME"></Property>
+      </PropertyDefine>
+    </Component> 
+  </ComponentType>
+
+
+  <ComponentType  typeName="大数据">
+    <Component typeName="spark">
+      <PropertyDefine>
+        <CommandText>
+          <![CDATA[
+          #!/bin/sh
+          echo "查看HistoryServer进程信息";
+          ps -ef|grep HistoryServer | grep -v grep
+          
+          echo "查看HistoryServer进程 监听端口";
+          for i in $(ps -ef|grep HistoryServer | grep -v grep |awk {print $2});
+            do
+              echo "HistoryServer进程 : "  $i "的监听端口";
+              sudo netstat -tnulp|grep $i; 
+            done
+            
+            
+          echo "查看JDBCServer进程信息";
+          ps -ef|grep JDBCServer | grep -v grep
+          
+          echo "查看JDBCServer进程 监听端口";
+          for n in $(ps -ef|grep JDBCServer | grep -v grep |awk {print $2});
+            do 
+              echo "JDBCServer进程 : "  $n "的监听端口";
+              sudo netstat -tnulp|grep $n; 
+            done
+              
+          ]]>
+        </CommandText>
+        <Property PropertyName="Process_Id" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_Id"> </Property>
+        <Property PropertyName="Process_UserName" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Parse_Process_UserName"></Property>
+        <Property PropertyName="Process_InstallPath" ParseClass="com.boco.Component_Scan.ComponetParse.Bigdata.spark"  ParseMethod="Process_InstallPath"></Property>
+        <Property PropertyName="Process_ListenPort" ParseClass="com.boco.Component_Scan.ComponetParse.Common"  ParseMethod="Process_ListenPort"></Property>
+      </PropertyDefine>
+    </Component>
+  </ComponentType>
+   
+</Component_Scan_Define>
